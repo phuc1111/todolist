@@ -12,6 +12,7 @@
         android:orientation="vertical">
 
         <EditText
+            android:id="@+id/ed_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Title">
@@ -19,6 +20,7 @@
         </EditText>
 
         <EditText
+            android:id="@+id/ed_date"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Date">
