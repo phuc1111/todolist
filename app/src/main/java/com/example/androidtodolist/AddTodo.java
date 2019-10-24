@@ -1,6 +1,7 @@
 package com.example.androidtodolist;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.room.Room;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
@@ -35,13 +36,17 @@ public class AddTodo extends AppCompatActivity {
         });
     }
 
+
+
     @SuppressLint("StaticFieldLeak")
     private void saveData(){
+        db = Room.databaseBuilder(getApplicationContext(),
+                AppDatabase.class, "database-name").build();
         final String title = ed_title.getText().toString();
         final String date = ed_date.getText().toString();
-        if (title.isEmpty() || date.isEmpty()){
-            Toast.makeText(this, "Title or date must not null", Toast.LENGTH_SHORT).show();
-        }
+//        if (title.isEmpty() || date.isEmpty()){
+//            Toast.makeText(this, "Title or date must not null", Toast.LENGTH_SHORT).show();
+//        }
         new AsyncTask<Void,Void,Void>(){
             @Override
             protected Void doInBackground(Void... voids) {

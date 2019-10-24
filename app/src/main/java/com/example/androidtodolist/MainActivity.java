@@ -13,6 +13,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.List;
 
@@ -21,6 +22,7 @@ public class MainActivity extends AppCompatActivity {
     EditText edtTitle;
     EditText edtDate;
     Button btnAdd;
+    Button btnDelete;
     LinearLayout main;
 
     @SuppressLint("StaticFieldLeak")
@@ -31,18 +33,9 @@ public class MainActivity extends AppCompatActivity {
         db = Room.databaseBuilder(getApplicationContext(),
                 AppDatabase.class, "database-name").build();
 
-        new AsyncTask<Void, Void, Void>() {
-            @Override
-            protected Void doInBackground(Void... voids) {
-                todo todo = new todo("aaa", "vvv");
-                db.todoDao().insert(todo);
-                return null;
-            }
-        }.execute();
+
         getTodoFromDatabase();
 
-        //main = findViewById(R.id.main_layout);
-        //final List<todo> listTodo = db.todoDao().getAll();
         btnAdd = findViewById(R.id.bt_add);
         btnAdd.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -50,6 +43,28 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(new Intent(MainActivity.this, AddTodo.class));
             }
         });
+    }
+
+    @SuppressLint("StaticFieldLeak")
+    private void deleteCartItem(final int i) {
+        db = Room.databaseBuilder(getApplicationContext(),
+                AppDatabase.class, "database-name").build();
+        final List <todo> todo =  db.todoDao().getAll();
+        new AsyncTask<Void, Void, Void>() {
+
+
+            @Override
+            protected Void doInBackground(Void... voids) {
+                db.todoDao().delete(todo.get(i));
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                super.onPostExecute(aVoid);
+                getTodoFromDatabase();
+            }
+        }.execute();
 
     }
 
@@ -63,23 +78,50 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
-            protected void onPostExecute(List<todo> todos) {
+            protected void onPostExecute(final List<todo> todos) {
                 super.onPostExecute(todos);
                 main = findViewById(R.id.main_layout);
                 for (int i = 0; i < todos.size(); i++) {
-                    //Log.i("tag", "value"+todos.get(i).getTitle());
+                    LinearLayout ln = new LinearLayout(MainActivity.this);
+                    ln.setOrientation(LinearLayout.HORIZONTAL);
+                    TextView title = new TextView(MainActivity.this);
+                    TextView date = new TextView(MainActivity.this);
+                    Button delete = new Button(MainActivity.this);
+                    title.setText(todos.get(i).getTitle());
+                    date.setText(todos.get(i).getDate());
+                    delete.setId(todos.get(i).getId());
+                    delete.setText("delete");
+                    final int j = i;
+                    delete.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+
+                            new AsyncTask<Void,Void,Void>(){
+                                @Override
+                                protected Void doInBackground(Void... voids) {
+                                    deleteCartItem(todos.get(j).getId());
+
+                                    return null;
+                                }
+
+                                @Override
+                                protected void onPostExecute(Void aVoid) {
+                                    super.onPostExecute(aVoid);
+
+                                }
+                            }.execute();
+                        }
+                    });
+
+                    ln.addView(title);
+                    ln.addView(date);
+                    ln.addView(delete);
+                    main.addView(ln);
 
                 }
             }
         }.execute();
     }
 
-//    private void setInfor(String title, String date) {
-//        main = findViewById(R.id.main_layout);
-//        TextView tv_title = new TextView(MainActivity.this);
-//        tv_title.setText(title);
-//        TextView tv_date = new TextView(MainActivity.this);
-//        tv_date.setText(date);
-//        Button bt_
-//    }
+
 }
